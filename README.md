@@ -122,15 +122,15 @@ CMD ["bash"]
 
 - different args:
 
-![docker_args.jpg](Docker%208e90f02bbae8484fbd7a932187398746/docker_args.jpg)
+![docker_args.jpg](img/docker_args.jpg)
 
 - if you have problems with graphics:
 
-![problems_with_graphics_docker.jpg](Docker%208e90f02bbae8484fbd7a932187398746/problems_with_graphics_docker.jpg)
+![problems_with_graphics_docker.jpg](img/problems_with_graphics_docker.jpg)
 
 - if you have a problem with language or time zone:
 
-![problem_with_timezone.jpg](Docker%208e90f02bbae8484fbd7a932187398746/problem_with_timezone.jpg)
+![problem_with_timezone.jpg](img/problem_with_timezone.jpg)
 
 - problem with autocomplete:
 

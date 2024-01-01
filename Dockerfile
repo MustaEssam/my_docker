@@ -34,6 +34,10 @@ RUN apt-get update \
   && apt-get install -y \
   ros-humble-gazebo-ros-pkgs\
   ros-humble-joint-state-publisher-gui\
+  ros-humble-rqt\
+  ros-humble-rqt-tf-tree\
+  ros-humble-image-transport-plugins\
+  ros-humble-rqt-image-view\
   && rm -rf /var/lib/apt/lists/*
 
 
