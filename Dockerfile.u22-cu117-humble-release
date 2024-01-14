@@ -77,13 +77,17 @@ RUN apt-get update || true && \
   ros-${ROS2_DIST}-image-transport-plugins \
   ros-${ROS2_DIST}-diagnostic-updater \
   ros-${ROS2_DIST}-xacro \
-  ros-${ROS_DISTRO}-rviz2 \
+  ros-${ROS2_DIST}-rviz2 \
   ros-${ROS2_DIST}-gazebo-ros-pkgs\
   ros-${ROS2_DIST}-joint-state-publisher-gui\
   ros-${ROS2_DIST}-rqt\
   ros-${ROS2_DIST}-rqt-tf-tree\
   ros-${ROS2_DIST}-image-transport-plugins\
   ros-${ROS2_DIST}-rqt-image-view\
+  ros-${ROS2_DIST}-teleop-twist-keyboard\
+  ros-${ROS2_DIST}-ros2-control\
+  ros-${ROS2_DIST}-ros2-controllers\
+  ros-${ROS2_DIST}-gazebo-ros2-control\
   python3-flake8-docstrings \
   python3-pip \
   python3-pytest-cov \
@@ -136,6 +140,8 @@ WORKDIR /home/${USERNAME}/
 # Setup environment variables
 COPY ros_entrypoint.sh /ros_entrypoint.sh
 RUN sudo chmod 755 /ros_entrypoint.sh
+
+COPY bashrc /home/${USERNAME}/.bashrc
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
