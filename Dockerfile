@@ -22,6 +22,8 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # Set up sudo
 RUN apt-get update \
   && apt-get install -y sudo \
+  python3-pip -y\
+  && pip3 install --user pygame numpy\
   && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
   && chmod 0440 /etc/sudoers.d/$USERNAME \
   && rm -rf /var/lib/apt/lists/*
@@ -38,6 +40,11 @@ RUN apt-get update \
   ros-humble-rqt-tf-tree\
   ros-humble-image-transport-plugins\
   ros-humble-rqt-image-view\
+  ros-humble-tf2-sensor-msgs\
+  ros-humble-tf2-geometry-msgs\
+  ros-humble-mavros* \
+  ros-humble-vision-opencv\
+  ros-humble-image-transport \
   && rm -rf /var/lib/apt/lists/*
 
 
@@ -49,6 +56,7 @@ RUN usermod -aG dialout ${USERNAME}
 COPY entrypoint.sh /entrypoint.sh
 COPY bashrc /home/${USERNAME}/.bashrc
 
+FROM carlasim/carla:latest
 
 # Set up entrypoint and default command
 ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

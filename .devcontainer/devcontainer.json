@@ -1,0 +1,43 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+	"name": "ROS-Dev",
+	"build": {
+		// Sets the run context to one level up instead of the .devcontainer folder.
+		"context": "..",
+		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+		"dockerfile": "../Dockerfile.u22-cu117-humble-release",
+	},
+
+	"mounts": [
+		"source=/home/mustafa/dev_ws,target=/home/ros/dev_ws,type=bind",
+		"source=/dev,target=/dev,type=bind",
+		"source=/tmp/.X11-unix/,target=/tmp/.X11-unix,type=bind"
+	],
+
+	"runArgs": [
+		"--runtime", "nvidia",
+		"-it",
+		"--privileged",
+		"--ipc=host",
+		"--pid=host",
+		"--network=host",
+		"-e", "NVIDIA_DRIVER_CAPABILITIES=all",
+		// "--user", "ros",
+		"-e", "DISPLAY"
+	],
+
+	"workspaceFolder": "/home/ros/"
+	
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "devcontainer"
+}

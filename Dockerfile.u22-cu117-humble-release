@@ -10,7 +10,7 @@ ARG ZED_SDK_MAJOR=4
 ARG ZED_SDK_MINOR=0
 ARG ZED_SDK_PATCH=7
 
-ARG ROS2_DIST=humble       # ROS2 distribution
+ARG ROS2_DIST=iron       # ROS2 distribution
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -25,7 +25,11 @@ ENV TZ=Europe/Paris
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \ 
   apt-get update && \
-  apt-get install --yes lsb-release wget less udev sudo build-essential cmake python3 python3-dev python3-pip python3-wheel git jq libopencv-dev libpq-dev zstd usbutils && \    
+  apt-get install --yes lsb-release wget less udev build-essential cmake \
+  python3 python3-dev python3-pip python3-wheel git jq \
+  # kmod \
+  # iproute2 \
+  libopencv-dev libpq-dev zstd usbutils && \    
   rm -rf /var/lib/apt/lists/*
 
 ############ Create a non-root user ##############
@@ -46,6 +50,9 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 RUN usermod -aG dialout ${USERNAME}
+
+# Add user to video group to allow access to webcam
+RUN sudo usermod --append --groups video $USERNAME
 
 ############ Install ROS2 ############
 ENV ROS_DISTRO ${ROS2_DIST}
@@ -81,6 +88,7 @@ RUN apt-get update || true && \
   ros-${ROS2_DIST}-gazebo-ros-pkgs\
   ros-${ROS2_DIST}-joint-state-publisher-gui\
   ros-${ROS2_DIST}-rqt\
+  ros-${ROS2_DIST}-rqt-common-plugins\
   ros-${ROS2_DIST}-rqt-tf-tree\
   ros-${ROS2_DIST}-image-transport-plugins\
   ros-${ROS2_DIST}-rqt-image-view\
@@ -88,6 +96,9 @@ RUN apt-get update || true && \
   ros-${ROS2_DIST}-ros2-control\
   ros-${ROS2_DIST}-ros2-controllers\
   ros-${ROS2_DIST}-gazebo-ros2-control\
+  ros-${ROS2_DIST}-slam-toolbox\
+  ros-${ROS2_DIST}-navigation2\
+  ros-${ROS2_DIST}-nav2-bringup\
   python3-flake8-docstrings \
   python3-pip \
   python3-pytest-cov \
@@ -95,7 +106,9 @@ RUN apt-get update || true && \
   ros-dev-tools && \
   pip3 install \
   argcomplete \
+  filterpy \
   numpy \
+  canopen \
   empy \
   lark && \
   rm -rf /var/lib/apt/lists/*
@@ -106,7 +119,7 @@ RUN curl -sSL http://get.gazebosim.org | sh
 # Initialize rosdep
 RUN rosdep init && rosdep update
 
-# Install the ZED SDK
+############# install ZED SDK #################
 RUN echo "CUDA Version $CUDA_VERSION" > /usr/local/cuda/version.txt
 
 # Setup the ZED SDK
@@ -120,6 +133,9 @@ RUN apt-get update || true && \
   rm ZED_SDK_Linux_Ubuntu.run && \
   rm -rf /var/lib/apt/lists/* && \
   apt-get autoremove && apt-get clean
+
+# # Switch from root to user
+# USER ros
 
 # Install the ZED ROS2 Wrapper
 WORKDIR /home/${USERNAME}/ros2_ws/src
@@ -141,7 +157,11 @@ WORKDIR /home/${USERNAME}/
 COPY ros_entrypoint.sh /ros_entrypoint.sh
 RUN sudo chmod 755 /ros_entrypoint.sh
 
-COPY bashrc /home/${USERNAME}/.bashrc
+# Source the ROS setup file
+RUN echo "source /opt/${USERNAME}/${ROS_DISTRO}/setup.bash && \
+  source /home/${USERNAME}/ros2_ws/install/local_setup.bash && \
+  source /home/${USERNAME}/dev_ws/install/local_setup.bash && \
+  export ROS_DOMAIN_ID=5 " >> ~/.bashrc
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
