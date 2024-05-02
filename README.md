@@ -1,6 +1,6 @@
 # Docker
 
-Created: December 25, 2023 1:59 PM
+These are some notes for using docker in general
 
 # Build
 
@@ -151,3 +151,6 @@ systemctl is-enabled docker
 ```
 
 then log out
+
+
+**Source:** [Articulated Robotics](https://beta.articulatedrobotics.xyz/category/docker-for-robotics)

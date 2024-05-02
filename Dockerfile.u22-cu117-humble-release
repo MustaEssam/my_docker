@@ -10,7 +10,7 @@ ARG ZED_SDK_MAJOR=4
 ARG ZED_SDK_MINOR=0
 ARG ZED_SDK_PATCH=7
 
-ARG ROS2_DIST=iron       # ROS2 distribution
+ARG ROS2_DIST=humble       # ROS2 distribution
 
 ARG DEBIAN_FRONTEND=noninteractive
 
