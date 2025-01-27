@@ -1,0 +1,84 @@
+# Start from the base ROS Humble image
+FROM ros-humble-base
+
+# Set up environment variables
+ARG USERNAME=ros
+ENV ROS_DISTRO=humble
+
+# Install RTAB-Map ROS 2 packages
+RUN apt-get update && \
+    apt-get install -y \
+    ros-${ROS_DISTRO}-rtabmap-ros \
+    ros-${ROS_DISTRO}-rtabmap-demos \
+    ros-${ROS_DISTRO}-rtabmap-examples \
+    ros-${ROS_DISTRO}-rtabmap-launch \
+    ros-${ROS_DISTRO}-rtabmap-util \
+    ros-${ROS_DISTRO}-rtabmap-viz \
+    ros-${ROS_DISTRO}-rtabmap-slam \
+    ros-${ROS_DISTRO}-rtabmap-odom \
+    ros-${ROS_DISTRO}-rtabmap-rviz-plugins \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install TurtleBot3 packages
+RUN apt-get update && \
+    apt-get install -y \
+    ros-${ROS_DISTRO}-turtlebot3* \
+    ros-${ROS_DISTRO}-turtlebot3-simulations \
+    ros-${ROS_DISTRO}-turtlebot3-navigation2 \
+    ros-${ROS_DISTRO}-turtlebot3-bringup \
+    ros-${ROS_DISTRO}-turtlebot3-teleop \
+    ros-${ROS_DISTRO}-turtlebot3-description \
+    ros-${ROS_DISTRO}-turtlebot3-msgs \
+    ros-${ROS_DISTRO}-turtlebot3-example \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install additional dependencies for RTAB-Map and TurtleBot3
+RUN apt-get update && \
+    apt-get install -y \
+    ros-${ROS_DISTRO}-gazebo-ros-pkgs \
+    ros-${ROS_DISTRO}-gazebo-ros2-control \
+    ros-${ROS_DISTRO}-navigation2 \
+    ros-${ROS_DISTRO}-nav2-bringup \
+    ros-${ROS_DISTRO}-slam-toolbox \
+    ros-${ROS_DISTRO}-rviz2 \
+    ros-${ROS_DISTRO}-xacro \
+    ros-${ROS_DISTRO}-joint-state-publisher-gui \
+    ros-${ROS_DISTRO}-robot-state-publisher \
+    ros-${ROS_DISTRO}-teleop-twist-keyboard \
+    ros-${ROS_DISTRO}-ros2-control \
+    ros-${ROS_DISTRO}-ros2-controllers \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Gazebo (required for TurtleBot3 simulations)
+RUN curl -sSL http://get.gazebosim.org | sh
+
+# Set up the workspace for RTAB-Map and TurtleBot3
+# WORKDIR /home/${USERNAME}/ros2_ws/src
+
+# Clone RTAB-Map ROS 2 wrapper (if not already installed via apt)
+# RUN git clone --recursive https://github.com/introlab/rtabmap_ros.git
+
+# Clone TurtleBot3 packages (if not already installed via apt)
+# RUN git clone -b ${ROS_DISTRO}-devel https://github.com/ROBOTIS-GIT/turtlebot3.git
+# RUN git clone -b ${ROS_DISTRO}-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+
+# Build the workspace
+# WORKDIR /home/${USERNAME}/ros2_ws
+# RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
+#     apt-get update -y || true && \
+#     rosdep install --from-paths src --ignore-src -r -y && \
+#     colcon build --symlink-install"
+
+# Source the workspace in the bashrc
+RUN echo "source /home/${USERNAME}/ros2_ws/install/setup.bash" >> ~/.bashrc
+
+# Set up the entrypoint
+# COPY ros_entrypoint.sh /ros_entrypoint.sh
+# RUN chmod 755 /ros_entrypoint.sh
+
+# Set the default working directory
+WORKDIR /home/${USERNAME}
+
+# entrypoint are available in the base image
+ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD ["bash"]

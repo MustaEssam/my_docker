@@ -1,0 +1,17 @@
+FROM ros-humble-base
+
+ARG USERNAME=ros
+ENV ROS_DISTRO=humble
+
+# Install Gazebo
+RUN curl -sSL http://get.gazebosim.org | sh
+
+# Install additional ROS 2 packages for simulation
+RUN apt-get update || true && \
+  apt-get install --no-install-recommends -y \
+  ros-${ROS2_DIST}-gazebo-ros-pkgs \
+  ros-${ROS2_DIST}-gazebo-ros2-control && \
+  rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD ["bash"]

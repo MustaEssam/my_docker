@@ -1,17 +1,21 @@
 #!/bin/bash
 set -e
 
-# setup ros2 environment
-source "/opt/ros/$ROS_DISTRO/setup.bash" --
-source "/home/ros/ros2_ws/install/local_setup.bash" --
+# Source the ROS 2 setup file
+source /opt/ros/humble/setup.bash
 
-# Welcome information
-echo "ZED ROS2 Docker Image"
-echo "---------------------"
-echo 'ROS distro: ' $ROS_DISTRO
-echo 'DDS middleware: ' $RMW_IMPLEMENTATION 
-echo "---"  
-echo 'Available ZED packages:'
-ros2 pkg list | grep zed
-echo "---------------------"    
+# Source the workspace setup file (if it exists)
+if [ -f /home/ros/ros2_ws/install/setup.bash ]; then
+    source /home/ros/ros2_ws/install/setup.bash
+fi
+
+if [ -f /home/ros/dev_ws/install/setup.bash ]; then
+    source /home/ros/dev_ws/install/setup.bash
+fi
+
+if [ -f /home/ros/test_ws/install/setup.bash ]; then
+    source /home/ros/test_ws/install/setup.bash
+fi
+
+# Execute the command passed to the container
 exec "$@"

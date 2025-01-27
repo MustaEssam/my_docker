@@ -1,0 +1,63 @@
+FROM ros-humble-base
+
+ARG ZED_SDK_MAJOR=4
+ARG ZED_SDK_MINOR=2
+ARG ZED_SDK_PATCH=3
+ARG UBUNTU_RELEASE_YEAR=22
+ARG CUDA_MAJOR=12
+ARG CUDA_MINOR=1
+
+ARG USERNAME=ros
+ENV ROS_DISTRO=humble
+
+# Install ZED SDK
+RUN apt-get update || true && \
+  apt-get install --no-install-recommends \
+  dialog \
+  bash-completion \
+  lsb-release \
+  wget \
+  less \
+  udev \
+  sudo  \
+  build-essential \
+  cmake \
+  zstd \
+  python3 \
+  python3-pip \
+  libpng-dev \
+  libopenblas-dev\
+  libgomp1 -y && \
+  python3 -m pip install --upgrade pip; python3 -m pip install numpy opencv-python-headless && \
+  apt-get clean
+
+RUN  wget -q -O ZED_SDK_Linux_Ubuntu.run https://download.stereolabs.com/zedsdk/$ZED_SDK_MAJOR.$ZED_SDK_MINOR/cu$CUDA_MAJOR/ubuntu$UBUNTU_RELEASE_YEAR && \
+  chmod +x ZED_SDK_Linux_Ubuntu.run && \
+  ./ZED_SDK_Linux_Ubuntu.run -- silent skip_tools skip_cuda && \
+  ln -sf /lib/x86_64-linux-gnu/libusb-1.0.so.0 /usr/lib/x86_64-linux-gnu/libusb-1.0.so && \
+  rm ZED_SDK_Linux_Ubuntu.run && \
+  rm -rf /var/lib/apt/lists/* && \
+  apt-get autoremove && apt-get clean
+
+# Install the ZED ROS2 Wrapper
+WORKDIR /home/${USERNAME}/ros2_ws/src
+RUN git clone --recursive https://github.com/stereolabs/zed-ros2-wrapper.git
+WORKDIR /home/${USERNAME}/ros2_ws
+
+RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
+  apt-get update -y || true && \
+  rosdep install --from-paths src --ignore-src -r -y && \
+  colcon build --parallel-workers $(nproc) --symlink-install \
+  --event-handlers console_direct+ --base-paths src \
+  --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
+  ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
+  ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
+
+# Set the default working directory
+WORKDIR /home/${USERNAME}
+
+# Source the ROS setup file
+RUN echo "source /home/${USERNAME}/ros2_ws/install/local_setup.bash" >> ~/.bashrc
+
+ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD ["bash"]

@@ -6,16 +6,19 @@
 		// Sets the run context to one level up instead of the .devcontainer folder.
 		"context": "..",
 		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
-		"dockerfile": "../Dockerfile.u22-cu117-humble-release",
+		"dockerfile": "../Dockerfile.u22-cu121-humble"
 	},
 
 	"mounts": [
 		"source=/home/mustafa/dev_ws,target=/home/ros/dev_ws,type=bind",
 		"source=/dev,target=/dev,type=bind",
-		"source=/tmp/.X11-unix/,target=/tmp/.X11-unix,type=bind"
+		"source=/tmp/.X11-unix/,target=/tmp/.X11-unix,type=bind",
+		"source=/home/mustafa/test_ws,target=/home/ros/test_ws,type=bind",
+		"source=${env:HOME}/.Xauthority,target=/home/ros/.Xauthority,type=bind"
 	],
 
 	"runArgs": [
+		// "--name", "ros-dev",
 		"--runtime", "nvidia",
 		"-it",
 		"--privileged",
@@ -23,6 +26,8 @@
 		"--pid=host",
 		"--network=host",
 		"-e", "NVIDIA_DRIVER_CAPABILITIES=all",
+		"-e", "XAUTHORITY=/home/ros/.Xauthority",
+	    "-e", "LIBGL_ALWAYS_SOFTWARE=0",  // Use GPU if available
 		// "--user", "ros",
 		"-e", "DISPLAY"
 	],

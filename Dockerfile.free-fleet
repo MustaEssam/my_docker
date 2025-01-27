@@ -1,0 +1,70 @@
+FROM ros-jazzy:latest
+
+ARG ROS2_DIST=jazzy
+
+# Install basic utilities
+RUN apt-get update || true && apt-get install -y --no-install-recommends \
+    apt-utils dialog sudo && \
+    rm -rf /var/lib/apt/lists/*
+
+# Prevent services from starting during installation
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    systemctl && \
+    apt-get clean && \
+    echo '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d && \
+    chmod +x /usr/sbin/policy-rc.d
+
+# Add the Zenoh repository and install Zenoh packages
+RUN echo "deb [trusted=yes] https://download.eclipse.org/zenoh/debian-repo/ /" | tee -a /etc/apt/sources.list && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    zenoh \
+    zenohd \
+    zenoh-plugin-rest \
+    zenoh-plugin-ros2dds \
+    zenoh-bridge-ros2dds \
+    zenoh-plugin-storage-manager && \
+    rm -rf /var/lib/apt/lists/*
+
+# Remove policy override
+RUN rm -f /usr/sbin/policy-rc.d
+# Install ROS2 dependencies
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    ros-${ROS2_DIST}-rmw-cyclonedds-cpp\
+    ros-${ROS2_DIST}-tf-transformations \
+    ros-${ROS2_DIST}-rmf-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone and build RMF demos
+WORKDIR /home/ros/ros2_ws/src
+RUN git clone https://github.com/open-rmf/rmf_demos.git -b ${ROS2_DIST}
+RUN git clone https://github.com/open-rmf/free_fleet
+WORKDIR /home/ros/ros2_ws
+# Install Python packages through apt
+RUN apt-get update || true && \
+    apt-get install --no-install-recommends -y \
+    python3-paho-mqtt\
+    python3-flask-socketio\
+    python3-fastapi\
+    python3-pydantic\
+    python3-uvicorn\
+    zip \
+    unzip\
+    && rm -rf /var/lib/apt/lists/*
+
+RUN /bin/bash -c "source /opt/ros/${ROS2_DIST}/setup.bash && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y && \
+    colcon build --symlink-install"
+    
+RUN pip3 install eclipse-zenoh==1.1.0 pycdr2 rosbags --break-system-packages
+
+# Copy entrypoint script
+COPY ros_entrypoint.sh /ros_entrypoint.sh
+RUN chmod +x /ros_entrypoint.sh
+
+# Set entrypoint
+ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD ["bash"]
