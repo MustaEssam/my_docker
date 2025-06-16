@@ -1,0 +1,55 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.rtabmap_frontiers_u22
+#1 transferring dockerfile: 3.65kB done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for nvcr.io/nvidia/cuda:12.9.0-cudnn-devel-ubuntu22.04
+#2 DONE 2.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.1s
+
+#4 [ 1/14] FROM nvcr.io/nvidia/cuda:12.9.0-cudnn-devel-ubuntu22.04@sha256:67d62b0967a91447f4f1ef22453dac317724e64cd7b29f4ad790216e5e2c3541
+#4 DONE 0.0s
+
+#5 [ 3/14] RUN apt-get update && apt-get install -y       libsqlite3-dev       libpcl-dev       git       cmake       libyaml-cpp-dev       software-properties-common       pkg-config       wget       libsuitesparse-dev       pybind11-dev       libeigen3-dev       libspdlog-dev       qtdeclarative5-dev       qt5-qmake       libqglviewer-dev-qt5       build-essential       libboost-all-dev       libfmt-dev
+#5 CACHED
+
+#6 [ 4/14] RUN apt-get update &&     cd /tmp &&     git clone https://github.com/borglab/gtsam.git &&     cd gtsam &&     mkdir build && cd build &&     cmake .. -DCMAKE_BUILD_TYPE=Release &&     make -j$(nproc) &&     make install &&     ldconfig &&     cd / && rm -rf /tmp/gtsam
+#6 CACHED
+
+#7 [ 2/14] RUN apt-get update && apt-get install -y     python3 python3-pip python3-dev     && pip3 install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu121
+#7 CACHED
+
+#8 [ 5/14] RUN git clone https://github.com/opencv/opencv_contrib.git &&     git clone https://github.com/opencv/opencv.git &&     cd opencv_contrib &&     git checkout tags/4.10.0 &&     cd ../opencv &&     git checkout tags/4.10.0 &&     mkdir build &&     cd build && pwd
+#8 CACHED
+
+#9 [internal] load build context
+#9 transferring context: 106.00kB 0.0s done
+#9 DONE 0.2s
+
+#10 [ 6/14] RUN cmake -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules     -DCMAKE_BUILD_TYPE=Release     -DBUILD_SHARED_LIBS=ON     -DBUILD_TESTS=OFF     -DBUILD_PERF_TESTS=OFF     -DOPENCV_ENABLE_NONFREE=ON     -DWITH_CUDA=ON     -DCUDA_ARCH_BIN="6.0,6.1,7.0,7.5,8.0,8.6,8.9,9.0" ..
+#10 0.742 CMake Error: The source directory "/" does not appear to contain CMakeLists.txt.
+#10 0.742 Specify --help for usage, or press the help button on the CMake GUI.
+#10 ERROR: process "/bin/sh -c cmake -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules     -DCMAKE_BUILD_TYPE=Release     -DBUILD_SHARED_LIBS=ON     -DBUILD_TESTS=OFF     -DBUILD_PERF_TESTS=OFF     -DOPENCV_ENABLE_NONFREE=ON     -DWITH_CUDA=ON     -DCUDA_ARCH_BIN=\"6.0,6.1,7.0,7.5,8.0,8.6,8.9,9.0\" .." did not complete successfully: exit code: 1
+------
+ > [ 6/14] RUN cmake -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules     -DCMAKE_BUILD_TYPE=Release     -DBUILD_SHARED_LIBS=ON     -DBUILD_TESTS=OFF     -DBUILD_PERF_TESTS=OFF     -DOPENCV_ENABLE_NONFREE=ON     -DWITH_CUDA=ON     -DCUDA_ARCH_BIN="6.0,6.1,7.0,7.5,8.0,8.6,8.9,9.0" ..:
+0.742 CMake Error: The source directory "/" does not appear to contain CMakeLists.txt.
+0.742 Specify --help for usage, or press the help button on the CMake GUI.
+------
+Dockerfile.rtabmap_frontiers_u22:56
+--------------------
+  55 |         cd build && pwd
+  56 | >>> RUN cmake -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+  57 | >>>     -DCMAKE_BUILD_TYPE=Release \
+  58 | >>>     -DBUILD_SHARED_LIBS=ON \
+  59 | >>>     -DBUILD_TESTS=OFF \
+  60 | >>>     -DBUILD_PERF_TESTS=OFF \
+  61 | >>>     -DOPENCV_ENABLE_NONFREE=ON \
+  62 | >>>     -DWITH_CUDA=ON \
+  63 | >>>     -DCUDA_ARCH_BIN="6.0,6.1,7.0,7.5,8.0,8.6,8.9,9.0" .. 
+  64 |     RUN make -j$(nproc) && \
+--------------------
+ERROR: failed to solve: process "/bin/sh -c cmake -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules     -DCMAKE_BUILD_TYPE=Release     -DBUILD_SHARED_LIBS=ON     -DBUILD_TESTS=OFF     -DBUILD_PERF_TESTS=OFF     -DOPENCV_ENABLE_NONFREE=ON     -DWITH_CUDA=ON     -DCUDA_ARCH_BIN=\"6.0,6.1,7.0,7.5,8.0,8.6,8.9,9.0\" .." did not complete successfully: exit code: 1

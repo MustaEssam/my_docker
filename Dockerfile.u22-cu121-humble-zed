@@ -57,7 +57,7 @@ RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
 WORKDIR /home/${USERNAME}
 
 # Source the ROS setup file
-RUN echo "source /home/${USERNAME}/ros2_ws/install/local_setup.bash" >> ~/.bashrc
+RUN echo "source /home/${USERNAME}/ros2_ws/install/setup.bash" >> ~/.bashrc
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
